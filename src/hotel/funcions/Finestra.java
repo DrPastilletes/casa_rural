@@ -28,6 +28,8 @@ public class Finestra extends JFrame{
 	public JTextField numPersones = new JTextField();
 	public JTextField numNits = new JTextField();
 	public JTextField nomHotel = new JTextField();
+	public JTextField numHabBack = new JTextField();
+	public JTextField numPersBack = new JTextField();
 	public JCalendar calendari = new JCalendar();
 	public JButton reserva = new JButton("RESERVA");
 	public JButton guarda = new JButton("GUARDA!");
@@ -200,10 +202,24 @@ public class Finestra extends JFrame{
         guarda.setBounds(150, 110, 100, 30);
         panell3.add(guarda);
         
-        JLabel jlRegNovaHabitacio = new JLabel("REGISTRE NOVA HABITACIÃ“:");
+        JLabel jlRegNovaHabitacio = new JLabel("REGISTRE NOVA HABITACIÓ:");
         jlRegNovaHabitacio.setBounds(20, 160, 250, 20);
         jlRegNovaHabitacio.setFont(new Font("arial",Font.PLAIN,16));
         panell3.add(jlRegNovaHabitacio);
+        
+        
+        JLabel jlNum = new JLabel("NUM:");
+        jlNum.setBounds(20, 190, 50, 20);
+        jlNum.setFont(new Font("arial",Font.PLAIN,16));
+        panell3.add(jlNum);
+        
+        numHabBack.setBounds(110, 80, 60, 20);
+        panell3.add(numHabBack);
+        
+        JLabel jlPers = new JLabel("# PERS:");
+        jlPers.setBounds(180, 190, 80, 20);
+        jlPers.setFont(new Font("arial",Font.PLAIN,16));
+        panell3.add(jlPers);
         
         
 
