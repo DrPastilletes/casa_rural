@@ -1,12 +1,23 @@
 package hotel.funcions;
 
 import java.awt.Color;
+import java.awt.Component;
 
 import hotel.*;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.lang.ModuleLayer.Controller;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -23,6 +34,9 @@ import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
 
 public class Finestra extends JFrame{
+	String alfabetString = "trwagmyfpdxbnjzsqvhlcke";
+	public Hotel hotel = new Hotel();
+	public char[] alfabet = alfabetString.toCharArray();
 	public JPanel panell1;
 	public JPanel panell2;
 	public JPanel panell3;
@@ -35,12 +49,18 @@ public class Finestra extends JFrame{
 	public JTextField numHabBack = new JTextField();
 	public JTextField numPersBack = new JTextField();
 	public JTextField nomClientBack = new JTextField();
+	public JTable taulaReservesP, taulaReservesC;
+	public DefaultTableModel modelPendents, modelConfirmades;
 	public JCalendar calendari = new JCalendar();
 	public JButton reserva = new JButton("RESERVA");
 	public JButton guarda = new JButton("GUARDA!");
 	public JButton guarda2 = new JButton("GUARDA!");
 	public JButton elimina = new JButton("ELIMINA!");
-    public Finestra() {
+	public JLabel imgDni, imgNom, imgCognoms, imgNumPers, imgNumNits;
+	public ImageIcon imgTrue = new ImageIcon(new ImageIcon("true.png").getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH));
+	public ImageIcon imgFalse = new ImageIcon(new ImageIcon("false.png").getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH));
+    public boolean comprovaNom, comprovaCognoms, comprovaDni, comprovaNumPersones, comprovaNumNits;
+	public Finestra() {
         setVisible(true);
         setSize(1200,700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -55,6 +75,9 @@ public class Finestra extends JFrame{
     
 	private void iniciarComponents() {
 		crearPanells();
+		afegirKeyListenerClient();
+		afegirActionListenerNomHotel();
+		afegirActionListenerReserva();
 	}
 
 	private void crearPanells() {
@@ -86,7 +109,7 @@ public class Finestra extends JFrame{
         System.out.println(panell2.getWidth()+" - "+panell2.getHeight());
         System.out.println(panell3.getWidth()+" - "+panell3.getHeight());
         
-        // GESTIÃ“ // PANELL1 //
+        // GESTIÓ // PANELL1 //
         JLabel gestio = new JLabel("Gestió");
         gestio.setBounds(0,20,398,20);
         gestio.setFont(new Font("arial",Font.BOLD,24));
@@ -98,12 +121,12 @@ public class Finestra extends JFrame{
         jlReservesP.setFont(new Font("arial",Font.PLAIN,16));
         panell1.add(jlReservesP);
         
-        DefaultTableModel modelPendents = new DefaultTableModel();
-        modelPendents.addColumn("#Reserva");
+        modelPendents = new DefaultTableModel();
         modelPendents.addColumn("Dia");
-        modelPendents.addColumn("Persona");
-        modelPendents.addColumn("HabitaciÃ³");
-        JTable taulaReservesP = new JTable(modelPendents);
+        modelPendents.addColumn("DNI");
+        modelPendents.addColumn("Persones");
+        modelPendents.addColumn("Habitació");
+        taulaReservesP = new JTable(modelPendents);
         taulaReservesP.setBounds(20, 110, 359, 200);
         panell1.add(taulaReservesP);
         JScrollPane scrollTaulaResP = new JScrollPane(taulaReservesP,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -119,12 +142,12 @@ public class Finestra extends JFrame{
         triarData.setBounds(250, 320, 130, 20);
         panell1.add(triarData);
         
-        DefaultTableModel modelConfirmades = new DefaultTableModel();
+        modelConfirmades = new DefaultTableModel();
         modelConfirmades.addColumn("Nom");
         modelConfirmades.addColumn("Date In");
         modelConfirmades.addColumn("Date Out");
-        modelConfirmades.addColumn("HabitaciÃ³");
-        JTable taulaReservesC = new JTable(modelConfirmades);
+        modelConfirmades.addColumn("Habitació");
+        taulaReservesC = new JTable(modelConfirmades);
         taulaReservesC.setBounds(20, 350, 359, 200);
         panell1.add(taulaReservesC);
         JScrollPane scrollTaulaResC = new JScrollPane(taulaReservesC,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -144,24 +167,39 @@ public class Finestra extends JFrame{
         jlDni.setFont(new Font("arial",Font.PLAIN,16));
         panell2.add(jlDni);
         
-        dni.setBounds(180, 80, 200, 20);
+        dni.setBounds(180, 80, 150, 20);
         panell2.add(dni);
+        dni.setName("dni");
+        
+        imgDni = new JLabel();
+        imgDni.setBounds(350, 80, 22, 22);
+        panell2.add(imgDni);
         
         JLabel jlNom = new JLabel("NOM:");
         jlNom.setBounds(20, 110, 100, 20);
         jlNom.setFont(new Font("arial",Font.PLAIN,16));
         panell2.add(jlNom);
         
-        nom.setBounds(180, 110, 200, 20);
+        nom.setBounds(180, 110, 150, 20);
         panell2.add(nom);
+        nom.setName("Nom");
+        
+        imgNom = new JLabel();
+        imgNom.setBounds(350, 110, 22, 22);
+        panell2.add(imgNom);
         
         JLabel jlCognom = new JLabel("COGNOMS:");
         jlCognom.setBounds(20, 140, 100, 20);
         jlCognom.setFont(new Font("arial",Font.PLAIN,16));
         panell2.add(jlCognom);
         
-        cognoms.setBounds(180, 140, 200, 20);
+        cognoms.setBounds(180, 140, 150, 20);
         panell2.add(cognoms);
+        cognoms.setName("Cognoms");
+        
+        imgCognoms = new JLabel();
+        imgCognoms.setBounds(350, 140, 22, 22);
+        panell2.add(imgCognoms);
         
         JLabel jlNumPers = new JLabel("NUM. PERSONES:");
         jlNumPers.setBounds(20, 170, 150, 20);
@@ -170,6 +208,11 @@ public class Finestra extends JFrame{
         
         numPersones.setBounds(180, 170, 60, 20);
         panell2.add(numPersones);
+        numPersones.setName("numPersones");
+        
+        imgNumPers = new JLabel();
+        imgNumPers.setBounds(250, 170, 22, 22);
+        panell2.add(imgNumPers);
         
         JLabel jlNumNits = new JLabel("NUM. NITS:");
         jlNumNits.setBounds(20, 200, 150, 20);
@@ -178,6 +221,11 @@ public class Finestra extends JFrame{
         
         numNits.setBounds(180, 200, 60, 20);
         panell2.add(numNits);
+        numNits.setName("numNits");
+        
+        imgNumNits = new JLabel();
+        imgNumNits.setBounds(250, 200, 22, 22);
+        panell2.add(imgNumNits);
         
         JLabel jlDataEntrada = new JLabel("DATA D'ENTRADA:");
         jlDataEntrada.setBounds(20, 270, 150, 20);
@@ -188,7 +236,9 @@ public class Finestra extends JFrame{
         panell2.add(calendari);
         
         reserva.setBounds(150, 570, 100, 30);
+        reserva.setEnabled(false);
         panell2.add(reserva);
+        
         
         // BACK // PANELL3 //
         
@@ -268,7 +318,183 @@ public class Finestra extends JFrame{
         elimina.setBounds(150, 520, 100, 30);
         panell3.add(elimina);
         
-
+        
 	}
+	
+	private void afegirActionListenerNomHotel() {
+		ActionListener clickNomHotel = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				setTitle(nomHotel.getText()); 
+				}
+		};
+		guarda.addActionListener(clickNomHotel);
+	}
+	
+	private void afegirActionListenerReserva() {
+		ActionListener clickReserva = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean clientExistent = false;
+				for (Client cli : hotel.getLlistaClients()) {
+					if(cli.getDni().equalsIgnoreCase(dni.getText())) {
+						clientExistent = true;
+						if(cli.getNom().equalsIgnoreCase(nom.getText())) {
+							if(cli.getCognoms().equalsIgnoreCase(cognoms.getText())) {
+								clientExistent = false;
+							}
+						}
+					}
+				}
+				if (!clientExistent) {
+					Client cli = new Client(nom.getText(),cognoms.getText(),dni.getText());	
+					LocalDate diaEntrada = Logica.calcularLocalDateAmbDate(calendari.getDate());
+					LocalDate diaSortida = diaEntrada.plusDays(Long.parseLong(numNits.getText())); 
+					Reserva res = new Reserva(cli, diaEntrada, diaSortida, Integer.parseInt(numPersones.getText()));
+					hotel.getLlistaClients().add(cli);
+					hotel.getLlistaReservesPendents().add(res);
+					String[] rowReserva = new String[4];
+					rowReserva = res.arrayReservaPendent();
+					modelPendents.addRow(rowReserva);
+					
+					for(Component component : panell2.getComponents()) {
+						if(component instanceof JTextField) {
+							((JTextField) component).setText("");
+						}
+						if(component instanceof JCalendar) {
+							Date avui = new Date();
+							avui.setTime(System.currentTimeMillis());
+							((JCalendar) component).setDate(avui);
+						}
+					}
+					comprovaDni = false;
+					comprovaNom = false;
+					comprovaCognoms = false;
+					comprovaNumNits = false;
+					comprovaNumPersones = false;
+					reserva.setEnabled(false);
+					imgDni.setIcon(imgFalse);
+					imgNom.setIcon(imgFalse);
+					imgCognoms.setIcon(imgFalse);
+					imgNumNits.setIcon(imgFalse);
+					imgNumPers.setIcon(imgFalse);
+				}
+				
+				
+			}
+		};
+		reserva.addActionListener(clickReserva);
+	}
+	
+	private void afegirKeyListenerClient() {
+		KeyListener listenerClient = new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				comprovaDni = false;
+				comprovaNom = false;
+				comprovaCognoms = false;
+				comprovaNumNits = false;
+				comprovaNumPersones = false;
+				reserva.setEnabled(false);
+				for(Component component : panell2.getComponents()) {
+					if(component instanceof JTextField || component instanceof JCalendar) {
+						switch (component.getName()) {
+						case "dni":
+							if(dni.getText().matches("^[0-9]{8,8}[A-Za-z]$")) {
+								String numDniString = dni.getText().substring(0, 8);
+								int numDni = Integer.parseInt(numDniString);
+								System.out.println(numDni);
+								int numAlfabet = numDni%23;
+								System.out.println(numAlfabet);
+								char lletra = dni.getText().charAt(8);
+								if(Character.toLowerCase(lletra) == Character.toLowerCase(alfabet[numAlfabet])) {
+									imgDni.setIcon(imgTrue);
+									comprovaDni = true;
+								}
+								else {
+									imgDni.setIcon(imgFalse);
+									comprovaDni = false;
+								}
+							}
+							else {
+								imgDni.setIcon(imgFalse);
+							}
+							break;
+						case "Nom":
+							if(Logica.nomesLletres(nom.getText())) {
+								imgNom.setIcon(imgTrue);
+								comprovaNom = true;
+							}
+							else {
+								imgNom.setIcon(imgFalse);
+								comprovaNom = false;
+							}
+							break;
+						case "Cognoms":
+							if(Logica.nomesLletres(cognoms.getText())) {
+								imgCognoms.setIcon(imgTrue);
+								comprovaCognoms = true;
+							}
+							else {
+								imgCognoms.setIcon(imgFalse);
+								comprovaCognoms = false;
+							}
+							break;
+						case "numPersones":
+							if(Logica.nomesNumeros(numPersones.getText())) {
+								imgNumPers.setIcon(imgTrue);
+								comprovaNumPersones = true;
+							}
+							else {
+								imgNumPers.setIcon(imgFalse);
+								comprovaNumPersones = false;
+							}
+							break;
+						case "numNits":
+							if(Logica.nomesNumeros(numNits.getText())) {
+								imgNumNits.setIcon(imgTrue);
+								comprovaNumNits = true;
+							}
+							else {
+								imgNumNits.setIcon(imgFalse);
+								comprovaNumNits = false;
+							}
+							break;
+
+						default:
+							break;
+						}
+
+					}
+					if(comprovaDni && comprovaNom && comprovaCognoms && comprovaNumPersones && comprovaNumNits) {
+						reserva.setEnabled(true);
+					}
+				}
+								
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+		dni.addKeyListener(listenerClient);
+		nom.addKeyListener(listenerClient);
+		cognoms.addKeyListener(listenerClient);
+		numPersones.addKeyListener(listenerClient);
+		numNits.addKeyListener(listenerClient);
+	}
+	
 	
 }
