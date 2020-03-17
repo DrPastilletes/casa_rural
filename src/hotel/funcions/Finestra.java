@@ -1,12 +1,16 @@
 package hotel.funcions;
 
 import java.awt.Color;
+
+import hotel.*;
 import java.awt.Dimension;
 import java.awt.Font;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -30,9 +34,12 @@ public class Finestra extends JFrame{
 	public JTextField nomHotel = new JTextField();
 	public JTextField numHabBack = new JTextField();
 	public JTextField numPersBack = new JTextField();
+	public JTextField nomClientBack = new JTextField();
 	public JCalendar calendari = new JCalendar();
 	public JButton reserva = new JButton("RESERVA");
 	public JButton guarda = new JButton("GUARDA!");
+	public JButton guarda2 = new JButton("GUARDA!");
+	public JButton elimina = new JButton("ELIMINA!");
     public Finestra() {
         setVisible(true);
         setSize(1200,700);
@@ -80,7 +87,7 @@ public class Finestra extends JFrame{
         System.out.println(panell3.getWidth()+" - "+panell3.getHeight());
         
         // GESTIÓ // PANELL1 //
-        JLabel gestio = new JLabel("Gestiò");
+        JLabel gestio = new JLabel("Gesti�");
         gestio.setBounds(0,20,398,20);
         gestio.setFont(new Font("arial",Font.BOLD,24));
         gestio.setHorizontalAlignment(SwingConstants.CENTER);
@@ -213,7 +220,7 @@ public class Finestra extends JFrame{
         jlNum.setFont(new Font("arial",Font.PLAIN,16));
         panell3.add(jlNum);
         
-        numHabBack.setBounds(110, 80, 60, 20);
+        numHabBack.setBounds(80, 190, 60, 20);
         panell3.add(numHabBack);
         
         JLabel jlPers = new JLabel("# PERS:");
@@ -221,6 +228,45 @@ public class Finestra extends JFrame{
         jlPers.setFont(new Font("arial",Font.PLAIN,16));
         panell3.add(jlPers);
         
+        numPersBack.setBounds(270, 190, 60, 20);
+        panell3.add(numPersBack);
+        
+        guarda2.setBounds(150, 220, 100, 30);
+        panell3.add(guarda2);
+        
+        JLabel jlConsultaReserves = new JLabel("CONSULTA RESERVA:");
+        jlConsultaReserves.setBounds(20, 270, 180, 20);
+        jlConsultaReserves.setFont(new Font("arial",Font.PLAIN,16));
+        panell3.add(jlConsultaReserves);
+        
+        JLabel jlNomClientBack = new JLabel("NOM CLIENT:");
+        jlNomClientBack.setBounds(20, 300, 130, 20);
+        jlNomClientBack.setFont(new Font("arial",Font.PLAIN,16));
+        panell3.add(jlNomClientBack);
+        
+        nomClientBack.setBounds(160, 300, 200, 20);
+        panell3.add(nomClientBack);
+        
+        DefaultListModel<Client> modelClient = new DefaultListModel<Client>();
+        JList<Client> llistaClient = new JList<Client>(modelClient);
+        llistaClient.setBounds(20, 340, 160, 160);
+        panell3.add(llistaClient);
+        
+        JScrollPane scrollLlistaClient = new JScrollPane(llistaClient,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollLlistaClient.setBounds(20, 340, 160, 160);
+        panell3.add(scrollLlistaClient);
+        
+        DefaultListModel<Reserva> modelReserva = new DefaultListModel<Reserva>();
+        JList<Reserva> llistaReserva = new JList<Reserva>(modelReserva);
+        llistaReserva.setBounds(20, 340, 160, 160);
+        panell3.add(llistaReserva);
+        
+        JScrollPane scrollLlistaReserva = new JScrollPane(llistaReserva,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollLlistaReserva.setBounds(210, 340, 160, 160);
+        panell3.add(scrollLlistaReserva);
+        
+        elimina.setBounds(150, 520, 100, 30);
+        panell3.add(elimina);
         
 
 	}
