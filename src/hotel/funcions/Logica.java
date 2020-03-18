@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class Logica {
 	public static boolean nomesLletres(String text) {
-		if (text.matches("^[A-Za-z\\s]{1,}[\\.]{0,1}[A-Za-z\\s]{0,}$")) {
+		if (text.matches("^[A-Za-z\\s]{2,}[\\.]{0,1}[A-Za-z\\s]{0,}$")) {
 			return true;
 		}else {
 			return false;
