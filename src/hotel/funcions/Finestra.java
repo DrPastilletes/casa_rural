@@ -249,11 +249,11 @@ public class Finestra extends JFrame{
         panell3.add(back);
         
         JLabel jlNomHotel = new JLabel("NOM HOTEL:");
-        jlNomHotel.setBounds(20, 80, 150, 20);
+        jlNomHotel.setBounds(20, 80, 110, 20);
         jlNomHotel.setFont(new Font("arial",Font.PLAIN,16));
         panell3.add(jlNomHotel);
         
-        nomHotel.setBounds(180, 80, 200, 20);
+        nomHotel.setBounds(140, 80, 220, 20);
         panell3.add(nomHotel);
         
         guarda.setBounds(150, 110, 100, 30);
@@ -369,6 +369,14 @@ public class Finestra extends JFrame{
 							avui.setTime(System.currentTimeMillis());
 							((JCalendar) component).setDate(avui);
 						}
+						if(component instanceof JLabel) {
+
+			                if(((JLabel) component).getIcon() != null) {
+
+			                    ((JLabel) component).setIcon(null);
+			                }
+
+			            }
 					}
 					comprovaDni = false;
 					comprovaNom = false;
@@ -376,14 +384,7 @@ public class Finestra extends JFrame{
 					comprovaNumNits = false;
 					comprovaNumPersones = false;
 					reserva.setEnabled(false);
-					imgDni.setIcon(imgFalse);
-					imgNom.setIcon(imgFalse);
-					imgCognoms.setIcon(imgFalse);
-					imgNumNits.setIcon(imgFalse);
-					imgNumPers.setIcon(imgFalse);
 				}
-				
-				
 			}
 		};
 		reserva.addActionListener(clickReserva);
