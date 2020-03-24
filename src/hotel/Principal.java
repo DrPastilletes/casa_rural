@@ -1,6 +1,6 @@
 package hotel;
 
-import hotel.funcions.Finestra;
+import disseny.Finestra;
 
 public class Principal {
 	public static void main(String[] args) {

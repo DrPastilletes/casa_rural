@@ -1,9 +1,13 @@
-package hotel.funcions;
+package disseny;
 
 import java.awt.Color;
 import java.awt.Component;
 
 import hotel.*;
+import model.Client;
+import model.Hotel;
+import model.Reserva;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
@@ -22,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -32,10 +37,11 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
+import hotel.controller.*;
 
 public class Finestra extends JFrame{
 	String alfabetString = "trwagmyfpdxbnjzsqvhlcke";
-	public Hotel hotel = new Hotel();
+	
 	public char[] alfabet = alfabetString.toCharArray();
 	public JPanel panell1;
 	public JPanel panell2;
@@ -53,13 +59,14 @@ public class Finestra extends JFrame{
 	public DefaultTableModel modelPendents, modelConfirmades;
 	public JCalendar calendari = new JCalendar();
 	public JButton reserva = new JButton("RESERVA");
-	public JButton guarda = new JButton("GUARDA!");
-	public JButton guarda2 = new JButton("GUARDA!");
+	public JButton butoGuardaNomHotel = new JButton("GUARDA!");
+	public JButton butoGuardaHabitacio = new JButton("GUARDA!");
 	public JButton elimina = new JButton("ELIMINA!");
 	public JLabel imgDni, imgNom, imgCognoms, imgNumPers, imgNumNits;
 	public ImageIcon imgTrue = new ImageIcon(new ImageIcon("true.png").getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH));
 	public ImageIcon imgFalse = new ImageIcon(new ImageIcon("false.png").getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH));
     public boolean comprovaNom, comprovaCognoms, comprovaDni, comprovaNumPersones, comprovaNumNits;
+    public Logica c;
 	public Finestra() {
         setVisible(true);
         setSize(1200,700);
@@ -69,6 +76,7 @@ public class Finestra extends JFrame{
         setMinimumSize(new Dimension(1200,700));        
         this.getContentPane().setBackground(Color.BLACK);
         this.setLayout(null);
+        c = new Logica();
         iniciarComponents();
 
     }
@@ -78,6 +86,7 @@ public class Finestra extends JFrame{
 		afegirKeyListenerClient();
 		afegirActionListenerNomHotel();
 		afegirActionListenerReserva();
+		afegirActionListenerHabitacio();
 	}
 
 	private void crearPanells() {
@@ -256,8 +265,8 @@ public class Finestra extends JFrame{
         nomHotel.setBounds(140, 80, 220, 20);
         panell3.add(nomHotel);
         
-        guarda.setBounds(150, 110, 100, 30);
-        panell3.add(guarda);
+        butoGuardaNomHotel.setBounds(150, 110, 100, 30);
+        panell3.add(butoGuardaNomHotel);
         
         JLabel jlRegNovaHabitacio = new JLabel("REGISTRE NOVA HABITACIÓ:");
         jlRegNovaHabitacio.setBounds(20, 160, 250, 20);
@@ -281,8 +290,8 @@ public class Finestra extends JFrame{
         numPersBack.setBounds(270, 190, 60, 20);
         panell3.add(numPersBack);
         
-        guarda2.setBounds(150, 220, 100, 30);
-        panell3.add(guarda2);
+        butoGuardaHabitacio.setBounds(150, 220, 100, 30);
+        panell3.add(butoGuardaHabitacio);
         
         JLabel jlConsultaReserves = new JLabel("CONSULTA RESERVA:");
         jlConsultaReserves.setBounds(20, 270, 180, 20);
@@ -330,7 +339,7 @@ public class Finestra extends JFrame{
 				setTitle(nomHotel.getText()); 
 				}
 		};
-		guarda.addActionListener(clickNomHotel);
+		butoGuardaNomHotel.addActionListener(clickNomHotel);
 	}
 	
 	private void afegirActionListenerReserva() {
@@ -338,52 +347,45 @@ public class Finestra extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean clientExistent = false;
-				for (Client cli : hotel.getLlistaClients()) {
-					if(cli.getDni().equalsIgnoreCase(dni.getText())) {
-						clientExistent = true;
-						if(cli.getNom().equalsIgnoreCase(nom.getText())) {
-							if(cli.getCognoms().equalsIgnoreCase(cognoms.getText())) {
-								clientExistent = false;
-							}
-						}
-					}
-				}
-				if (!clientExistent) {
-					Client cli = new Client(nom.getText(),cognoms.getText(),dni.getText());	
+				if (!c.comprovarSiClientExisteix(dni, nom, cognoms)) {
 					LocalDate diaEntrada = Logica.calcularLocalDateAmbDate(calendari.getDate());
 					LocalDate diaSortida = diaEntrada.plusDays(Long.parseLong(numNits.getText())); 
-					Reserva res = new Reserva(cli, diaEntrada, diaSortida, Integer.parseInt(numPersones.getText()));
-					hotel.getLlistaClients().add(cli);
-					hotel.getLlistaReservesPendents().add(res);
-					String[] rowReserva = new String[4];
-					rowReserva = res.arrayReservaPendent();
-					modelPendents.addRow(rowReserva);
 					
-					for(Component component : panell2.getComponents()) {
-						if(component instanceof JTextField) {
-							((JTextField) component).setText("");
+					c.afegirClientHotel(c.crearClient(nom, cognoms, dni));
+					
+					Reserva res = c.crearReserva(c.crearClient(nom, cognoms, dni), diaEntrada, diaSortida, numPersones);
+					Reserva resAux = c.comprovarCapacitatHabitacio(res);
+//					c.afegirReservaHotel(resAux);
+					String[] rowReserva = new String[4];
+					if (resAux!=null) {
+						rowReserva = resAux.arrayReservaPendent();
+						modelPendents.addRow(rowReserva);
+						for(Component component : panell2.getComponents()) {
+							if(component instanceof JTextField) {
+								((JTextField) component).setText("");
+							}
+							if(component instanceof JCalendar) {
+								Date avui = new Date();
+								avui.setTime(System.currentTimeMillis());
+								((JCalendar) component).setDate(avui);
+							}
+							if(component instanceof JLabel) {
+
+				                if(((JLabel) component).getIcon() != null) {
+
+				                    ((JLabel) component).setIcon(null);
+				                }
+
+				            }
 						}
-						if(component instanceof JCalendar) {
-							Date avui = new Date();
-							avui.setTime(System.currentTimeMillis());
-							((JCalendar) component).setDate(avui);
-						}
-						if(component instanceof JLabel) {
-
-			                if(((JLabel) component).getIcon() != null) {
-
-			                    ((JLabel) component).setIcon(null);
-			                }
-
-			            }
+						comprovaDni = false;
+						comprovaNom = false;
+						comprovaCognoms = false;
+						comprovaNumNits = false;
+						comprovaNumPersones = false;
+						reserva.setEnabled(false);
 					}
-					comprovaDni = false;
-					comprovaNom = false;
-					comprovaCognoms = false;
-					comprovaNumNits = false;
-					comprovaNumPersones = false;
-					reserva.setEnabled(false);
+					
 				}
 			}
 		};
@@ -414,9 +416,7 @@ public class Finestra extends JFrame{
 							if(dni.getText().matches("^[0-9]{8,8}[A-Za-z]$")) {
 								String numDniString = dni.getText().substring(0, 8);
 								int numDni = Integer.parseInt(numDniString);
-								System.out.println(numDni);
 								int numAlfabet = numDni%23;
-								System.out.println(numAlfabet);
 								char lletra = dni.getText().charAt(8);
 								if(Character.toLowerCase(lletra) == Character.toLowerCase(alfabet[numAlfabet])) {
 									imgDni.setIcon(imgTrue);
@@ -432,7 +432,7 @@ public class Finestra extends JFrame{
 							}
 							break;
 						case "Nom":
-							if(Logica.nomesLletres(nom.getText())) {
+							if(c.nomesLletres(nom.getText())) {
 								imgNom.setIcon(imgTrue);
 								comprovaNom = true;
 							}
@@ -442,7 +442,7 @@ public class Finestra extends JFrame{
 							}
 							break;
 						case "Cognoms":
-							if(Logica.nomesLletres(cognoms.getText())) {
+							if(c.nomesLletres(cognoms.getText())) {
 								imgCognoms.setIcon(imgTrue);
 								comprovaCognoms = true;
 							}
@@ -452,7 +452,7 @@ public class Finestra extends JFrame{
 							}
 							break;
 						case "numPersones":
-							if(Logica.nomesNumeros(numPersones.getText())) {
+							if(c.nomesNumeros(numPersones.getText())) {
 								imgNumPers.setIcon(imgTrue);
 								comprovaNumPersones = true;
 							}
@@ -462,7 +462,7 @@ public class Finestra extends JFrame{
 							}
 							break;
 						case "numNits":
-							if(Logica.nomesNumeros(numNits.getText())) {
+							if(c.nomesNumeros(numNits.getText())) {
 								imgNumNits.setIcon(imgTrue);
 								comprovaNumNits = true;
 							}
@@ -497,5 +497,30 @@ public class Finestra extends JFrame{
 		numNits.addKeyListener(listenerClient);
 	}
 	
-	
+	private void afegirActionListenerHabitacio() {
+		ActionListener clickHabitacio = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String[] options = {"Si","No"};
+                int opcio = JOptionPane.showOptionDialog(null, "Estas segur que vols afegir la habitació!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, options[0]);
+                switch(opcio) {
+                	case 0:
+                		String[] options1 = {"Ok"};
+                		JOptionPane.showOptionDialog(null, "La habitació s'ha afegit amb exit!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options1, options1[0]);
+                		c.crearHabitacio(numHabBack, numPersBack);
+        				numPersBack.setText("");
+        				numHabBack.setText("");
+                		break;
+                	case 1:
+                		String[] options2 = {"Ok"};
+                		JOptionPane.showOptionDialog(null, "La habitació no s'ha afegit!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options2, options2[0]);
+                		break;
+                }
+				
+			}
+		};
+		butoGuardaHabitacio.addActionListener(clickHabitacio);
+	}
 }

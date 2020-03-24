@@ -1,4 +1,4 @@
-package hotel;
+package model;
 
 import java.time.LocalDate;
 
@@ -6,8 +6,8 @@ public class Reserva {
 	private Habitacio habitacio;
 	private Client client;
 	private LocalDate diaEntrada, diaSortida;
-	private int numPersones;
-	public Reserva(Client client, LocalDate diaEntrada, LocalDate diaSortida, int numPersones) {
+	private Integer numPersones;
+	public Reserva(Client client, LocalDate diaEntrada, LocalDate diaSortida, Integer numPersones) {
 		super();
 		this.client = client;
 		this.diaEntrada = diaEntrada;
@@ -58,6 +58,14 @@ public class Reserva {
 	public LocalDate getDiaSortida() {
 		return diaSortida;
 	}
+	public Integer getNumPersones() {
+		return numPersones;
+	}
+
+	public void setNumPersones(Integer numPersones) {
+		this.numPersones = numPersones;
+	}
+
 	public void setDiaSortida(LocalDate diaSortida) {
 		this.diaSortida = diaSortida;
 	}
@@ -67,7 +75,7 @@ public class Reserva {
 		array[0]=this.diaEntrada.getDayOfMonth()+"-"+this.diaEntrada.getMonthValue()+"-"+this.diaEntrada.getYear();
 		array[1]=client.getDni();
 		array[2]=this.numPersones+"";
-		array[3]="";
+		array[3]=this.getHabitacio().getNumHabitacio()+"";
 		return array;
 	}
 	

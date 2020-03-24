@@ -1,4 +1,4 @@
-package hotel;
+package model;
 
 public class Client {
 	private String nom, cognoms, dni;

@@ -6,9 +6,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/Carles/Desktop/eclipse/llibreries/JCalendar/jcalendar-1.4.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Carles/Desktop/eclipse/llibreries/JCalendar/jgoodies-common-1.2.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Carles/Desktop/eclipse/llibreries/JCalendar/jgoodies-looks-2.4.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Carles/Desktop/eclipse/llibreries/JCalendar/junit-4.6.jar"/>
+	<classpathentry excluding="src/" kind="src" path=""/>
+	<classpathentry kind="lib" path="C:/Users/Carles/Desktop/java_eclipse/casa_rural/llibreries/JCalendar/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Carles/Desktop/java_eclipse/casa_rural/llibreries/JCalendar/jgoodies-common-1.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Carles/Desktop/java_eclipse/casa_rural/llibreries/JCalendar/jgoodies-looks-2.4.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Carles/Desktop/java_eclipse/casa_rural/llibreries/JCalendar/junit-4.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

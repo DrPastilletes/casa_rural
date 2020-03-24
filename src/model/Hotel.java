@@ -1,4 +1,4 @@
-package hotel;
+package model;
 
 import java.util.ArrayList;
 
@@ -11,6 +11,7 @@ public class Hotel {
 	public Hotel() {
 		super();
 	}
+	
 	public String getNomHotel() {
 		return nomHotel;
 	}
