@@ -28,33 +28,48 @@ public class Logica {
 		return res;
 	}
 	
+	public boolean comprovarHabitacio(JTextField numHabitacio) {
+		int numHab = Integer.parseInt(numHabitacio.getText());
+		for(Habitacio habi : hotel.getLlistaHab()) {
+			if(habi.getNumHabitacio()==numHab) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void crearHabitacio(JTextField numHabitacio, JTextField numPersones) {
 		int numHab = Integer.parseInt(numHabitacio.getText());
 		int numPers = Integer.parseInt(numPersones.getText());
+		Habitacio hab = new Habitacio(numHab, numPers);
+		afegirHabitacioHotel(hab);
+	}
 
+	
+	public int preguntaModificarHabitacio(JTextField numHabitacio, JTextField numPersones) {
+		int numHab = Integer.parseInt(numHabitacio.getText());
+		int numPers = Integer.parseInt(numPersones.getText());
+		int opcio = 1;
 		for(Habitacio habi : hotel.getLlistaHab()) {
 			if(habi.getNumHabitacio()==numHab) {
 				String[] options = {"Si","No"};
-                int opcio = JOptionPane.showOptionDialog(null, "Estas segur que vols modificar de "+habi.getNumPersones()+" persones a "+ numHab+"?", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, options[0]);
-				switch (opcio) {
-				case 0:
-					String[] options2 = {"Ok"};
-					JOptionPane.showOptionDialog(null, "S'ha modificat la habitació!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options2, options2[0]);
-					habi.setNumPersones(numPers);
-					afegirHabitacioHotel(habi);
-					break;
-
-				case 1:
-					String[] options1 = {"Ok"};
-					JOptionPane.showOptionDialog(null, "No s'ha modificat la habitació!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options1, options1[0]);
-					break;
-				}
-                
+	            opcio = JOptionPane.showOptionDialog(null, "Estas segur que vols modificar de "+habi.getNumPersones()+" persones a "+ numPers+"?", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, options[0]);
+	            return opcio;
 			}
 		}
-		
-		Habitacio hab = new Habitacio(numHab, numPers);
-		afegirHabitacioHotel(hab);
+		return opcio;
+
+	}
+	
+	public void modificarHabitacio(JTextField numHabitacio, JTextField numPersones) {
+		int numHab = Integer.parseInt(numHabitacio.getText());
+		int numPers = Integer.parseInt(numPersones.getText());
+		for(Habitacio habi : hotel.getLlistaHab()) {
+			if(habi.getNumHabitacio()==numHab) {
+				habi.setNumPersones(numPers);
+			}
+		}
+			
 	}
 	
 	public void afegirClientHotel(Client cli) {
@@ -141,22 +156,22 @@ public class Logica {
 	}
 	
 	public boolean comprovarDisponibilitatHabitacio(Reserva res, Integer numHabitacio) {
-		boolean comprovarData = false;
+		boolean comprovarHabitacio = false;
 		LocalDate diaEntrada = res.getDiaEntrada();
 		LocalDate diaSortida = res.getDiaSortida();
 		for(Reserva resIterador : hotel.getLlistaReservesPendents()) {
 			System.out.println(resIterador.toString());
 			if(numHabitacio==resIterador.getHabitacio().getNumHabitacio()) {
 				System.out.println("Titan");
-				comprovarData = true;
-				if (diaEntrada.isAfter(resIterador.getDiaSortida()) || diaSortida.isBefore(resIterador.getDiaEntrada()) || diaEntrada.equals(resIterador.getDiaSortida())) {
+				comprovarHabitacio = true;
+				if (diaEntrada.isAfter(resIterador.getDiaSortida()) || diaSortida.isBefore(resIterador.getDiaEntrada()) || diaEntrada.equals(resIterador.getDiaSortida()) || diaSortida.equals(resIterador.getDiaEntrada())) {
 					System.out.println("Data fora de rang");
 					return true;
 				}
 			}
 		}
 		System.out.println("Abans del IF");
-		if(comprovarData) {
+		if(comprovarHabitacio) {
 			System.out.println("Dintre If");
 			return false;
 		}

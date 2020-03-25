@@ -358,6 +358,8 @@ public class Finestra extends JFrame{
 //					c.afegirReservaHotel(resAux);
 					String[] rowReserva = new String[4];
 					if (resAux!=null) {
+						String[] options2 = {"Ok"};
+						JOptionPane.showOptionDialog(null, "S'ha creat la reserva amb exit!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options2, options2[0]);
 						rowReserva = resAux.arrayReservaPendent();
 						modelPendents.addRow(rowReserva);
 						for(Component component : panell2.getComponents()) {
@@ -384,6 +386,10 @@ public class Finestra extends JFrame{
 						comprovaNumNits = false;
 						comprovaNumPersones = false;
 						reserva.setEnabled(false);
+					}
+					else {
+						String[] options2 = {"Ok"};
+						JOptionPane.showOptionDialog(null, "Hi ha hagut algun problema a l'hora de crear la reserva... Torna-ho a intentar!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options2, options2[0]);
 					}
 					
 				}
@@ -503,21 +509,40 @@ public class Finestra extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				String[] options = {"Si","No"};
-                int opcio = JOptionPane.showOptionDialog(null, "Estas segur que vols afegir la habitació!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, options[0]);
-                switch(opcio) {
-                	case 0:
-                		String[] options1 = {"Ok"};
-                		JOptionPane.showOptionDialog(null, "La habitació s'ha afegit amb exit!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options1, options1[0]);
-                		c.crearHabitacio(numHabBack, numPersBack);
-        				numPersBack.setText("");
-        				numHabBack.setText("");
-                		break;
-                	case 1:
-                		String[] options2 = {"Ok"};
-                		JOptionPane.showOptionDialog(null, "La habitació no s'ha afegit!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options2, options2[0]);
-                		break;
+				if(c.comprovarHabitacio(numHabBack)) {
+					int opcio = c.preguntaModificarHabitacio(numHabBack, numPersBack);
+					switch (opcio) {
+						case 0:
+							c.modificarHabitacio(numHabBack, numPersBack);
+							String[] options2 = {"Ok"};
+							JOptionPane.showOptionDialog(null, "S'ha modificat la habitació!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options2, options2[0]);
+	        				numPersBack.setText("");
+	        				numHabBack.setText("");
+							break;
+			
+						case 1:
+							String[] options1 = {"Ok"};
+							JOptionPane.showOptionDialog(null, "No s'ha modificat la habitació!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options1, options1[0]);
+							break;
+					}
                 }
+				else {
+					String[] options = {"Si","No"};
+	                int opcio = JOptionPane.showOptionDialog(null, "Estas segur que vols afegir la habitació!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, options[0]);
+	                switch(opcio) {
+	                	case 0:
+	                		String[] options1 = {"Ok"};
+	                		JOptionPane.showOptionDialog(null, "La habitació s'ha afegit amb exit!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options1, options1[0]);
+	                		c.crearHabitacio(numHabBack, numPersBack);
+	        				numPersBack.setText("");
+	        				numHabBack.setText("");
+	                		break;
+	                	case 1:
+	                		String[] options2 = {"Ok"};
+	                		JOptionPane.showOptionDialog(null, "La habitació no s'ha afegit!", "Avís", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options2, options2[0]);
+	                		break;
+	                }
+				}
 				
 			}
 		};
