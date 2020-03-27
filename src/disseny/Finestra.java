@@ -15,6 +15,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.ModuleLayer.Controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,8 +35,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JCalendar;
@@ -58,10 +65,12 @@ public class Finestra extends JFrame{
 	public JTable taulaReservesP, taulaReservesC;
 	public DefaultTableModel modelPendents, modelConfirmades;
 	public JCalendar calendari = new JCalendar();
+	public JDateChooser triarData;
 	public JButton reserva = new JButton("RESERVA");
 	public JButton butoGuardaNomHotel = new JButton("GUARDA!");
 	public JButton butoGuardaHabitacio = new JButton("GUARDA!");
 	public JButton elimina = new JButton("ELIMINA!");
+	public JToggleButton butoSortidaEntrada;
 	public JLabel imgDni, imgNom, imgCognoms, imgNumPers, imgNumNits;
 	public ImageIcon imgTrue = new ImageIcon(new ImageIcon("true.png").getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH));
 	public ImageIcon imgFalse = new ImageIcon(new ImageIcon("false.png").getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH));
@@ -87,6 +96,9 @@ public class Finestra extends JFrame{
 		afegirActionListenerNomHotel();
 		afegirActionListenerReserva();
 		afegirActionListenerHabitacio();
+		afegirActionListenerTBSortidaEntrada();
+		afegirClickListenerTaulaReserves();
+		afegirDateChooserListener();
 	}
 
 	private void crearPanells() {
@@ -137,17 +149,25 @@ public class Finestra extends JFrame{
         modelPendents.addColumn("Habitació");
         taulaReservesP = new JTable(modelPendents);
         taulaReservesP.setBounds(20, 110, 359, 200);
+        taulaReservesP.setEnabled(false);
         panell1.add(taulaReservesP);
         JScrollPane scrollTaulaResP = new JScrollPane(taulaReservesP,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollTaulaResP.setBounds(20, 110, 359, 200);
         panell1.add(scrollTaulaResP);
         
-        JLabel jlReservesC = new JLabel("RESERVES CONFIRMADES:");
-        jlReservesC.setBounds(20, 320, 220, 20);
-        jlReservesC.setFont(new Font("arial",Font.PLAIN,16));
-        panell1.add(jlReservesC);
+        butoSortidaEntrada = new JToggleButton("Entrada");
+        butoSortidaEntrada.setBounds(20, 320, 140, 20);
+        panell1.add(butoSortidaEntrada);
         
-        JDateChooser triarData = new JDateChooser();
+//        JLabel jlReservesC = new JLabel("RESERVES CONFIRMADES:");
+//        jlReservesC.setBounds(20, 320, 220, 20);
+//        jlReservesC.setFont(new Font("arial",Font.PLAIN,16));
+//        panell1.add(jlReservesC);
+        
+        triarData = new JDateChooser();
+        Date avui = new Date();
+		avui.setTime(System.currentTimeMillis());
+        triarData.setDate(avui);
         triarData.setBounds(250, 320, 130, 20);
         panell1.add(triarData);
         
@@ -547,5 +567,93 @@ public class Finestra extends JFrame{
 			}
 		};
 		butoGuardaHabitacio.addActionListener(clickHabitacio);
+	}
+
+	private void afegirActionListenerTBSortidaEntrada() {
+		ActionListener clickSortidaEntrada = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				ArrayList<Reserva> reserves = c.comprovarDataReservaConfirmada(butoSortidaEntrada, triarData);
+					for (int i = 0; i<taulaReservesC.getRowCount();i++) {
+						modelConfirmades.removeRow(i);
+					}
+				for(Reserva res : reserves) {
+					String[] rowReserva = res.arrayReservaPendent();
+					modelConfirmades.addRow(rowReserva);
+				}
+				JToggleButton jtb = (JToggleButton)e.getSource();
+	            if (jtb.isSelected()) {
+	            	butoSortidaEntrada.setText("Sortida");
+	            } else {
+	            	butoSortidaEntrada.setText("Entrada");
+	            }
+			}
+		};
+		butoSortidaEntrada.addActionListener(clickSortidaEntrada);
+	}
+	
+	private void afegirClickListenerTaulaReserves() {
+		taulaReservesP.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				 if(e.getClickCount()==2) {
+					c.deReservesPendentsAConfirmades(modelPendents, taulaReservesP.rowAtPoint(e.getPoint()));
+					ArrayList<Reserva> reserves = c.comprovarDataReservaConfirmada(butoSortidaEntrada, triarData);
+					for (int i = 0; i<taulaReservesC.getRowCount();i++) {
+						modelConfirmades.removeRow(i);
+					}
+					for(Reserva res : reserves) {
+						String[] rowReserva = res.arrayReservaPendent();
+						modelConfirmades.addRow(rowReserva);
+					}
+					modelPendents.removeRow(taulaReservesP.rowAtPoint(e.getPoint()));
+				 }
+			}
+		});
+	}
+	
+	private void afegirDateChooserListener() {
+		PropertyChangeListener changeData = new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+			ArrayList<Reserva> reserves = c.comprovarDataReservaConfirmada(butoSortidaEntrada, triarData);
+			for (int i = 0; i<taulaReservesC.getRowCount();i++) {
+				modelConfirmades.removeRow(i);
+			}
+			for(Reserva res : reserves) {
+				String[] rowReserva = res.arrayReservaPendent();
+				modelConfirmades.addRow(rowReserva);
+			}
+				
+			}
+		};
+		triarData.addPropertyChangeListener(changeData);
 	}
 }

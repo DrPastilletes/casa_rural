@@ -4,11 +4,17 @@ import java.security.DrbgParameters.Capability;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 
+import com.toedter.calendar.JDateChooser;
 
 import model.*;
 
@@ -170,13 +176,42 @@ public class Logica {
 				}
 			}
 		}
-		System.out.println("Abans del IF");
 		if(comprovarHabitacio) {
-			System.out.println("Dintre If");
 			return false;
 		}
-		System.out.println("Despres del If");
 		return true;
 	}
 	
+	public void deReservesPendentsAConfirmades(DefaultTableModel modelPendents, int index) {
+		String dia = (String)modelPendents.getValueAt(index, 0);
+		String numHabString = (String)modelPendents.getValueAt(index, 3);
+		String[] data = dia.split("-");
+		LocalDate dataRes = LocalDate.of(Integer.parseInt(data[2]) , Integer.parseInt(data[1]), Integer.parseInt(data[0]));
+		int numHab = Integer.parseInt(numHabString);
+		Reserva reser = new Reserva();
+		hotel.getLlistaReservesPendents().add(reser);
+		Reserva res = hotel.getLlistaReservesPendents().get(index);
+		if(res.getDiaEntrada().equals(dataRes) && res.getHabitacio().getNumHabitacio()==numHab) {
+			hotel.getLlistaReservesConfirmades().add(res);
+			hotel.getLlistaReservesPendents().remove(res);
+		}
+	}
+	
+	public ArrayList<Reserva> comprovarDataReservaConfirmada(JToggleButton butoSortidaEntrada, JDateChooser triarData) {
+		ArrayList<Reserva> reserves = new ArrayList<Reserva>();
+		LocalDate dia = calcularLocalDateAmbDate(triarData.getDate());
+		for(Reserva res : hotel.getLlistaReservesConfirmades()) {
+			if(butoSortidaEntrada.isSelected()) {
+				if(res.getDiaSortida().equals(dia)) {
+					reserves.add(res);
+				}
+			}
+			else {
+				if(res.getDiaEntrada().equals(dia)) {
+					reserves.add(res);
+				}
+			}
+		}
+		return reserves;
+	}
 }
