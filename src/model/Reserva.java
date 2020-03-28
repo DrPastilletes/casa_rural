@@ -78,6 +78,11 @@ public class Reserva {
 		array[3]=this.getHabitacio().getNumHabitacio()+"";
 		return array;
 	}
+
+	@Override
+	public String toString() {
+		return habitacio.getNumHabitacio()+" - "+diaEntrada.toString()+" - "+diaSortida.toString();
+	}
 	
 	
 }

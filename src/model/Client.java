@@ -37,5 +37,10 @@ public class Client {
 	public void setDni(String dni) {
 		this.dni = dni;
 	}
+
+	@Override
+	public String toString() {
+		return nom.substring(0, 1)+"."+cognoms+" - "+dni;
+	}
 	
 }

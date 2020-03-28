@@ -64,6 +64,10 @@ public class Finestra extends JFrame{
 	public JTextField nomClientBack = new JTextField();
 	public JTable taulaReservesP, taulaReservesC;
 	public DefaultTableModel modelPendents, modelConfirmades;
+	public DefaultListModel<Reserva> modelReserva;
+	public JList<Reserva> llistaReserva;
+	public DefaultListModel<Client> modelClient;
+	public JList<Client> llistaClient;
 	public JCalendar calendari = new JCalendar();
 	public JDateChooser triarData;
 	public JButton reserva = new JButton("RESERVA");
@@ -99,6 +103,8 @@ public class Finestra extends JFrame{
 		afegirActionListenerTBSortidaEntrada();
 		afegirClickListenerTaulaReserves();
 		afegirDateChooserListener();
+		afegirMouseListenerLlistaClient();
+		afegirKeyListenerNomBack();
 	}
 
 	private void crearPanells() {
@@ -326,8 +332,8 @@ public class Finestra extends JFrame{
         nomClientBack.setBounds(160, 300, 200, 20);
         panell3.add(nomClientBack);
         
-        DefaultListModel<Client> modelClient = new DefaultListModel<Client>();
-        JList<Client> llistaClient = new JList<Client>(modelClient);
+        modelClient = new DefaultListModel<Client>();
+        llistaClient = new JList<Client>(modelClient);
         llistaClient.setBounds(20, 340, 160, 160);
         panell3.add(llistaClient);
         
@@ -335,8 +341,8 @@ public class Finestra extends JFrame{
         scrollLlistaClient.setBounds(20, 340, 160, 160);
         panell3.add(scrollLlistaClient);
         
-        DefaultListModel<Reserva> modelReserva = new DefaultListModel<Reserva>();
-        JList<Reserva> llistaReserva = new JList<Reserva>(modelReserva);
+        modelReserva = new DefaultListModel<Reserva>();
+        llistaReserva = new JList<Reserva>(modelReserva);
         llistaReserva.setBounds(20, 340, 160, 160);
         panell3.add(llistaReserva);
         
@@ -576,9 +582,9 @@ public class Finestra extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				ArrayList<Reserva> reserves = c.comprovarDataReservaConfirmada(butoSortidaEntrada, triarData);
-					for (int i = 0; i<taulaReservesC.getRowCount();i++) {
-						modelConfirmades.removeRow(i);
-					}
+				while(modelConfirmades.getRowCount()!=0) {
+					modelConfirmades.removeRow(0);
+				}
 				for(Reserva res : reserves) {
 					String[] rowReserva = res.arrayReservaPendent();
 					modelConfirmades.addRow(rowReserva);
@@ -625,8 +631,8 @@ public class Finestra extends JFrame{
 				 if(e.getClickCount()==2) {
 					c.deReservesPendentsAConfirmades(modelPendents, taulaReservesP.rowAtPoint(e.getPoint()));
 					ArrayList<Reserva> reserves = c.comprovarDataReservaConfirmada(butoSortidaEntrada, triarData);
-					for (int i = 0; i<taulaReservesC.getRowCount();i++) {
-						modelConfirmades.removeRow(i);
+					while(modelConfirmades.getRowCount()!=0) {
+						modelConfirmades.removeRow(0);
 					}
 					for(Reserva res : reserves) {
 						String[] rowReserva = res.arrayReservaPendent();
@@ -644,8 +650,8 @@ public class Finestra extends JFrame{
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 			ArrayList<Reserva> reserves = c.comprovarDataReservaConfirmada(butoSortidaEntrada, triarData);
-			for (int i = 0; i<taulaReservesC.getRowCount();i++) {
-				modelConfirmades.removeRow(i);
+			while(modelConfirmades.getRowCount()!=0) {
+				modelConfirmades.removeRow(0);
 			}
 			for(Reserva res : reserves) {
 				String[] rowReserva = res.arrayReservaPendent();
@@ -655,5 +661,75 @@ public class Finestra extends JFrame{
 			}
 		};
 		triarData.addPropertyChangeListener(changeData);
+	}
+	
+	private void afegirMouseListenerLlistaClient() {
+		llistaClient.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				llistaClient.getSelectedValue();
+				ArrayList<Reserva> reserves = c.buscaReservesClient(nomClientBack);
+				for(Reserva res : reserves) {
+					if(res.getClient().equals(llistaClient.getSelectedValue())) {
+						modelReserva.addElement(res);
+					}
+				}
+			}
+		});
+	}
+	
+	private void afegirKeyListenerNomBack() {
+		nomClientBack.addKeyListener( new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				modelClient.clear();
+				ArrayList<Reserva> reserves = c.buscaReservesClient(nomClientBack);
+				for(Reserva res : reserves) {
+					if(!modelClient.contains(res.getClient())){
+						modelClient.addElement(res.getClient());
+					}
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 }

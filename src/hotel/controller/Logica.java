@@ -143,7 +143,7 @@ public class Logica {
 						afegirReservaHotel(res);
 						return res;
 					}
-					if(comprovarDisponibilitatHabitacio(res, hab.getNumHabitacio())) {
+					if(comprovarDisponibilitatHabitacioPendents(res, hab.getNumHabitacio()) && comprovarDisponibilitatHabitacioConfirmades(res, hab.getNumHabitacio())) {
 						System.out.println("He afegit una reserva!");
 						Habitacio h = new Habitacio();
 						res.setHabitacio(h);
@@ -161,17 +161,34 @@ public class Logica {
 		return res;
 	}
 	
-	public boolean comprovarDisponibilitatHabitacio(Reserva res, Integer numHabitacio) {
+	public boolean comprovarDisponibilitatHabitacioPendents(Reserva res, Integer numHabitacio) {
 		boolean comprovarHabitacio = false;
 		LocalDate diaEntrada = res.getDiaEntrada();
 		LocalDate diaSortida = res.getDiaSortida();
 		for(Reserva resIterador : hotel.getLlistaReservesPendents()) {
 			System.out.println(resIterador.toString());
 			if(numHabitacio==resIterador.getHabitacio().getNumHabitacio()) {
-				System.out.println("Titan");
 				comprovarHabitacio = true;
 				if (diaEntrada.isAfter(resIterador.getDiaSortida()) || diaSortida.isBefore(resIterador.getDiaEntrada()) || diaEntrada.equals(resIterador.getDiaSortida()) || diaSortida.equals(resIterador.getDiaEntrada())) {
-					System.out.println("Data fora de rang");
+					return true;
+				}
+			}
+		}
+		if(comprovarHabitacio) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean comprovarDisponibilitatHabitacioConfirmades(Reserva res, Integer numHabitacio) {
+		boolean comprovarHabitacio = false;
+		LocalDate diaEntrada = res.getDiaEntrada();
+		LocalDate diaSortida = res.getDiaSortida();
+		for(Reserva resIterador : hotel.getLlistaReservesConfirmades()) {
+			System.out.println(resIterador.toString());
+			if(numHabitacio==resIterador.getHabitacio().getNumHabitacio()) {
+				comprovarHabitacio = true;
+				if (diaEntrada.isAfter(resIterador.getDiaSortida()) || diaSortida.isBefore(resIterador.getDiaEntrada()) || diaEntrada.equals(resIterador.getDiaSortida()) || diaSortida.equals(resIterador.getDiaEntrada())) {
 					return true;
 				}
 			}
@@ -183,18 +200,9 @@ public class Logica {
 	}
 	
 	public void deReservesPendentsAConfirmades(DefaultTableModel modelPendents, int index) {
-		String dia = (String)modelPendents.getValueAt(index, 0);
-		String numHabString = (String)modelPendents.getValueAt(index, 3);
-		String[] data = dia.split("-");
-		LocalDate dataRes = LocalDate.of(Integer.parseInt(data[2]) , Integer.parseInt(data[1]), Integer.parseInt(data[0]));
-		int numHab = Integer.parseInt(numHabString);
-		Reserva reser = new Reserva();
-		hotel.getLlistaReservesPendents().add(reser);
 		Reserva res = hotel.getLlistaReservesPendents().get(index);
-		if(res.getDiaEntrada().equals(dataRes) && res.getHabitacio().getNumHabitacio()==numHab) {
-			hotel.getLlistaReservesConfirmades().add(res);
-			hotel.getLlistaReservesPendents().remove(res);
-		}
+		hotel.getLlistaReservesConfirmades().add(res);
+		hotel.getLlistaReservesPendents().remove(res);
 	}
 	
 	public ArrayList<Reserva> comprovarDataReservaConfirmada(JToggleButton butoSortidaEntrada, JDateChooser triarData) {
@@ -214,4 +222,36 @@ public class Logica {
 		}
 		return reserves;
 	}
+	
+	public ArrayList<Reserva> buscaReservesClient(JTextField nomClientBack){
+		ArrayList<Reserva> reserves = new ArrayList<Reserva>();
+		String nom = nomClientBack.getText();
+		for(Reserva res : hotel.getLlistaReservesPendents()) {
+			if(res.getClient().getNom().contains(nom)) {
+				reserves.add(res);
+			}else if(res.getClient().getCognoms().contains(nom)){
+				reserves.add(res);
+			}else if(res.getClient().getDni().contains(nom)) {
+				reserves.add(res);
+			}
+		}
+		for(Reserva res : hotel.getLlistaReservesConfirmades()) {
+			if(res.getClient().getNom().contains(nom)) {
+				reserves.add(res);
+			}else if(res.getClient().getCognoms().contains(nom)){
+				reserves.add(res);
+			}else if(res.getClient().getDni().contains(nom)) {
+				reserves.add(res);
+			}
+		}
+		return reserves;
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 }
