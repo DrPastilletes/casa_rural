@@ -73,13 +73,28 @@ public class Logica {
 		for(Habitacio habi : hotel.getLlistaHab()) {
 			if(habi.getNumHabitacio()==numHab) {
 				habi.setNumPersones(numPers);
-			}
+			} 
 		}
 			
 	}
 	
 	public void afegirClientHotel(Client cli) {
-		hotel.getLlistaClients().add(cli);
+		boolean iguals = true;
+		if(hotel.getLlistaClients().size()!=0) {
+			for(Client cliIterador : hotel.getLlistaClients()) {
+				if(!cliIterador.getDni().equalsIgnoreCase(cli.getDni())) {
+					iguals = false;
+					System.out.println(hotel.getLlistaClients());
+				}
+			}
+			if(!iguals) {
+				hotel.getLlistaClients().add(cli);
+			}
+		}
+		else {
+			hotel.getLlistaClients().add(cli);
+		}
+		
 	}
 	
 	public void afegirReservaHotel(Reserva res) {
@@ -136,7 +151,7 @@ public class Logica {
 			for(Habitacio hab : hotel.getLlistaHab()) {
 				Integer numHab = hab.getNumHabitacio();
 				if((hab.getNumPersones()-i)==res.getNumPersones()) {
-					if(hotel.getLlistaReservesPendents().size()==0) {
+					if(hotel.getLlistaReservesPendents().size()==0 && hotel.getLlistaReservesConfirmades().size()==0) {
 						Habitacio h = new Habitacio();
 						res.setHabitacio(h);
 						res.getHabitacio().setNumHabitacio(hab.getNumHabitacio());
@@ -245,13 +260,58 @@ public class Logica {
 			}
 		}
 		return reserves;
-		
 	}
 	
+	public ArrayList<Client> buscarClient(JTextField nomClientBack){
+		ArrayList<Client> clients = new ArrayList<Client>();
+		String nom = nomClientBack.getText();
+		System.out.println(hotel.getLlistaClients());
+		for(Client cli : hotel.getLlistaClients()) {
+			if(cli.getNom().contains(nom)) {
+				clients.add(cli);
+			}else if(cli.getCognoms().contains(nom)){
+				clients.add(cli);
+			}else if(cli.getDni().contains(nom)) {
+				clients.add(cli);
+			}
+		}
+		return clients;
+	}
 	
+	public void eliminarReserva(Reserva reserva) {
+		if(hotel.getLlistaReservesPendents().contains(reserva)) {
+			hotel.getLlistaReservesPendents().remove(reserva);
+		}
+		if(hotel.getLlistaReservesConfirmades().contains(reserva)) {
+			hotel.getLlistaReservesConfirmades().remove(reserva);
+		}
+	}
 	
+	public Boolean eliminarReservaTaula(Reserva reserva) {
+		if(hotel.getLlistaReservesPendents().contains(reserva)) {
+			return true;
+		}
+		if(hotel.getLlistaReservesConfirmades().contains(reserva)) {
+			return false;
+		}
+		return null;
+	}
 	
-	
-	
-	
+	public Integer retornarIndexTaula(Reserva reserva, boolean bool) {
+		if(bool) {
+			for(int i = 0; i<hotel.getLlistaReservesPendents().size();i++) {
+				if(hotel.getLlistaReservesPendents().contains(reserva)) {
+					return i;
+				}
+			}
+		}
+		else {
+			for(int i = 0; i<hotel.getLlistaReservesConfirmades().size();i++) {
+				if(hotel.getLlistaReservesConfirmades().contains(reserva)) {
+					return i;
+				}
+			}
+		}
+		return null;
+	}
 }

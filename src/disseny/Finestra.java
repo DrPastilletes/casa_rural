@@ -105,6 +105,8 @@ public class Finestra extends JFrame{
 		afegirDateChooserListener();
 		afegirMouseListenerLlistaClient();
 		afegirKeyListenerNomBack();
+		afegirMouseListenerLlistaReserva();
+		afegirClickEliminar();
 	}
 
 	private void crearPanells() {
@@ -178,9 +180,9 @@ public class Finestra extends JFrame{
         panell1.add(triarData);
         
         modelConfirmades = new DefaultTableModel();
+        modelConfirmades.addColumn("DNI");
         modelConfirmades.addColumn("Nom");
-        modelConfirmades.addColumn("Date In");
-        modelConfirmades.addColumn("Date Out");
+        modelConfirmades.addColumn("Cognoms");
         modelConfirmades.addColumn("Habitació");
         taulaReservesC = new JTable(modelConfirmades);
         taulaReservesC.setBounds(20, 350, 359, 200);
@@ -378,7 +380,6 @@ public class Finestra extends JFrame{
 					LocalDate diaSortida = diaEntrada.plusDays(Long.parseLong(numNits.getText())); 
 					
 					c.afegirClientHotel(c.crearClient(nom, cognoms, dni));
-					
 					Reserva res = c.crearReserva(c.crearClient(nom, cognoms, dni), diaEntrada, diaSortida, numPersones);
 					Reserva resAux = c.comprovarCapacitatHabitacio(res);
 //					c.afegirReservaHotel(resAux);
@@ -586,7 +587,7 @@ public class Finestra extends JFrame{
 					modelConfirmades.removeRow(0);
 				}
 				for(Reserva res : reserves) {
-					String[] rowReserva = res.arrayReservaPendent();
+					String[] rowReserva = res.arrayReservaConfirmada();
 					modelConfirmades.addRow(rowReserva);
 				}
 				JToggleButton jtb = (JToggleButton)e.getSource();
@@ -635,7 +636,7 @@ public class Finestra extends JFrame{
 						modelConfirmades.removeRow(0);
 					}
 					for(Reserva res : reserves) {
-						String[] rowReserva = res.arrayReservaPendent();
+						String[] rowReserva = res.arrayReservaConfirmada();
 						modelConfirmades.addRow(rowReserva);
 					}
 					modelPendents.removeRow(taulaReservesP.rowAtPoint(e.getPoint()));
@@ -654,7 +655,7 @@ public class Finestra extends JFrame{
 				modelConfirmades.removeRow(0);
 			}
 			for(Reserva res : reserves) {
-				String[] rowReserva = res.arrayReservaPendent();
+				String[] rowReserva = res.arrayReservaConfirmada();
 				modelConfirmades.addRow(rowReserva);
 			}
 				
@@ -695,9 +696,74 @@ public class Finestra extends JFrame{
 				// TODO Auto-generated method stub
 				llistaClient.getSelectedValue();
 				ArrayList<Reserva> reserves = c.buscaReservesClient(nomClientBack);
+				modelReserva.clear();
 				for(Reserva res : reserves) {
-					if(res.getClient().equals(llistaClient.getSelectedValue())) {
+					if(res.getClient().getDni().equals(llistaClient.getSelectedValue().getDni())) {
 						modelReserva.addElement(res);
+					}
+				}
+			}
+		});
+	}
+	
+	private void afegirMouseListenerLlistaReserva() {
+		llistaReserva.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				llistaReserva.getSelectedValue();
+//				llistaReserva.remove(llistaReserva.getSelectedIndex());
+				
+			}
+		});
+	}
+	
+	private void afegirClickEliminar() {
+		elimina.addActionListener( new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(c.eliminarReservaTaula(llistaReserva.getSelectedValue())) {
+					modelPendents.removeRow(c.retornarIndexTaula(llistaReserva.getSelectedValue(), c.eliminarReservaTaula(llistaReserva.getSelectedValue())));
+				}
+				else {
+					modelConfirmades.removeRow(c.retornarIndexTaula(llistaReserva.getSelectedValue(), c.eliminarReservaTaula(llistaReserva.getSelectedValue())));
+				}
+				c.eliminarReserva(llistaReserva.getSelectedValue());
+				modelReserva.remove(llistaReserva.getSelectedIndex());
+				modelClient.clear();
+				if(nomClientBack.getText().length()!=0) {
+					ArrayList<Client> clients = c.buscarClient(nomClientBack);
+					for(Client cli : clients) {
+						if(!modelClient.contains(cli)){
+							modelClient.addElement(cli);
+							System.out.println(cli);
+						}
 					}
 				}
 			}
@@ -717,11 +783,17 @@ public class Finestra extends JFrame{
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
 				modelClient.clear();
-				ArrayList<Reserva> reserves = c.buscaReservesClient(nomClientBack);
-				for(Reserva res : reserves) {
-					if(!modelClient.contains(res.getClient())){
-						modelClient.addElement(res.getClient());
+				if(nomClientBack.getText().length()!=0) {
+					ArrayList<Client> clients = c.buscarClient(nomClientBack);
+					for(Client cli : clients) {
+//						if(!modelClient.contains(cli)){
+							modelClient.addElement(cli);
+							System.out.println(cli);
+//						}
 					}
+				}
+				else {
+					modelReserva.clear();
 				}
 			}
 			

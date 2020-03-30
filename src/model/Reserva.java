@@ -78,6 +78,15 @@ public class Reserva {
 		array[3]=this.getHabitacio().getNumHabitacio()+"";
 		return array;
 	}
+	
+	public String[] arrayReservaConfirmada() {
+		String[] array = new String[4];
+		array[0]=client.getDni();
+		array[1]=client.getNom();
+		array[2]=client.getCognoms();
+		array[3]=this.getHabitacio().getNumHabitacio()+"";
+		return array;
+	}
 
 	@Override
 	public String toString() {
